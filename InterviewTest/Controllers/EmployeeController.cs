@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InterviewTest.Controllers
 {
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : BaseAppController
     {
         public EmployeeController()
         {
@@ -19,9 +19,11 @@ namespace InterviewTest.Controllers
         /// <param name="employeeService"></param>
         /// <returns></returns>
         [HttpGet("List")]
-        public Task<List<BaseEmployeeeDTO>> List(int? page, [FromServices] IBaseEmployeeService employeeService)
+        public async Task<ApiResponse<List<BaseEmployeeeDTO>>> List(int? page, [FromServices] IBaseEmployeeService employeeService)
         {
-            return employeeService.List(page.GetValueOrDefault(0));
+            if(page < 0)
+                return WrapErrorResult<List<BaseEmployeeeDTO>>("Page must be greater than 0");
+            return WrapResult(await employeeService.List(page.GetValueOrDefault(0)));
         }
     }
 }

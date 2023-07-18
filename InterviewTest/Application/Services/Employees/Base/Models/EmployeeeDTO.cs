@@ -10,12 +10,11 @@ namespace InterviewTest.Application.Services.Employees.Base.Models
         public long Id { get; set; }
         public string Name { get; set; }
         public byte Age { get; set; }
-        public int BornIn { get; set; }
+        public int BornIn => DateTime.Now.Year - Age;
 
         internal static void CreateMappingRules(AutoMapperGlobalProfile profile)
         {
             profile.CreateMap<Employee, BaseEmployeeeDTO>()
-                   .ForMember(c => c.BornIn, x => x.MapFrom(src => DateTime.Now.Year - src.Age))
                    ;
         }
     }
