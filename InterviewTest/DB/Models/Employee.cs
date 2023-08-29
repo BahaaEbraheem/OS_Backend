@@ -5,5 +5,7 @@
         public string Name { get; set; }
 
         public byte Age { get; set; }
+        public ICollection<Task> Tasks { get; set; }
+
     }
 }

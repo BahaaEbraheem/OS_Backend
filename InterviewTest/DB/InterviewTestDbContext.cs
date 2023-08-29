@@ -1,6 +1,7 @@
 ﻿using InterviewTest.DB.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Task = InterviewTest.DB.Models.Task;
 
 namespace InterviewTest.DB
 {
@@ -13,6 +14,7 @@ namespace InterviewTest.DB
 
 
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Task> Tasks { get; set; }
 
 
 
