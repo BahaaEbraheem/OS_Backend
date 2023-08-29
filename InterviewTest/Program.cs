@@ -2,6 +2,7 @@ using AutoMapper;
 using InterviewTest.AutoMapperRules.Profiles;
 using InterviewTest.DB;
 using InterviewTest.DI;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddResponseCaching();
 //Adding the dependency injection info
 builder.Services.AddDependencyInjection();
 
@@ -46,5 +47,15 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+// Configure caching for the List endpoint
+app.MapControllerRoute(
+    name: "default",
+    pattern: "api/{controller}/{action}",
+    defaults: new { action = "Index" }
+).WithMetadata(new ResponseCacheAttribute
+{
+    Duration = 60,
+    VaryByQueryKeys = new[] { "*" } // Cache variant to all query parameters
+});
 
 app.Run();
