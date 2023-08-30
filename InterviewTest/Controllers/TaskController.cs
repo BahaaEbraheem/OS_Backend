@@ -1,4 +1,5 @@
-﻿using InterviewTest.Application.Services.Employees.Base;
+﻿using Abp.Application.Services.Dto;
+using InterviewTest.Application.Services.Employees.Base;
 using InterviewTest.Application.Services.Employees.Base.Models;
 using InterviewTest.Application.Services.Tasks.Base;
 using InterviewTest.Application.Services.Tasks.Base.Models;
@@ -6,6 +7,7 @@ using InterviewTest.DB.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing.Printing;
 using static InterviewTest.DB.Enums.Enum;
 using Task = InterviewTest.DB.Models.Task;
 
@@ -32,11 +34,11 @@ namespace InterviewTest.Controllers
             return WrapResult(await taskService.List(page.GetValueOrDefault(0)));
         }
 
-        [HttpGet("GetTasksWithFilters")]
-        public async Task<ApiResponse<List<BaseTaskDTO>>> GetTasksWithFilters(Status? status, Priority? priority, int pageNumber, int pageSize, int? employeeId, [FromServices] IBaseTaskService taskService)
-        {
-            return WrapResult(await taskService.GetTasksWithFilters(status,priority,pageNumber,pageSize,employeeId));
-        }
+        //[HttpGet("GetTasksWithFilters")]
+        //public async Task<ApiResponse<List<BaseTaskDTO>>> GetTasksWithFilters(Status? status, Priority? priority, int pageNumber, int pageSize, int? employeeId, [FromServices] IBaseTaskService taskService)
+        //{
+        //    return WrapResult(await taskService.GetTasksWithFilters(status,priority,pageNumber,pageSize,employeeId));
+        //}
 
         [HttpPost("addTask")]
         public  async Task<ApiResponse<BaseTaskDTO>> AddTask(int pageNumber, int pageSize,[FromServices] IBaseTaskService taskService,[FromBody] BaseTaskDTO inputModel)
@@ -89,6 +91,11 @@ namespace InterviewTest.Controllers
 
         }
 
+        [HttpGet("GetTaskPagedListAsync")]
+        public async Task<PagedResultDto<BaseTaskDTO>> GetTaskPagedListAsync(TaskPagedAndSortedResultRequestDto input, [FromServices] IBaseTaskService taskService)
+        {
+            return (await taskService.GetTaskPagedListAsync(input));
+        }
 
     }
 

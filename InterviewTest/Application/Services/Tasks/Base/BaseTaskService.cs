@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Abp.Application.Services.Dto;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
 using InterviewTest.Application.Services.Employees.Base.Models;
@@ -7,6 +8,8 @@ using InterviewTest.DB.Models;
 using InterviewTest.DB.Repositories;
 
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Threading.Tasks;
 using static InterviewTest.DB.Enums.Enum;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
@@ -17,7 +20,11 @@ namespace InterviewTest.Application.Services.Tasks.Base
     public interface IBaseTaskService
     {
         Task<List<BaseTaskDTO>> List(int page);
-        Task<List<BaseTaskDTO>> GetTasksWithFilters(Status? status, Priority? priority, int pageNumber, int pageSize, int? employeeId);
+
+        Task<PagedResultDto<BaseTaskDTO>> GetTaskPagedListAsync(TaskPagedAndSortedResultRequestDto input);
+
+
+        //Task<List<BaseTaskDTO>> GetTasksWithFilters(Status? status, Priority? priority, int pageNumber, int pageSize, int? employeeId);
         Task<BaseTaskDTO> AddTask(int pageNumber, int pageSize, BaseTaskDTO inputModel);
         Task<bool> TaskExists(string title);
     }
@@ -42,23 +49,23 @@ namespace InterviewTest.Application.Services.Tasks.Base
                        .ToListAsync();
         }
 
-        async Task<List<BaseTaskDTO>> IBaseTaskService.GetTasksWithFilters(
-      Status? status = null,
-      Priority? priority = null,
-      int pageNumber = 1,
-      int pageSize = 10,
-      int? employeeId = null)
-        {
+      //  async Task<List<BaseTaskDTO>> IBaseTaskService.GetTasksWithFilters(
+      //Status? status = null,
+      //Priority? priority = null,
+      //int pageNumber = 1,
+      //int pageSize = 10,
+      //int? employeeId = null)
+      //  {
 
-            var tasks = Repo.GetTasksWithFilters(status, priority, pageNumber, pageSize, employeeId)
-             .Skip((pageNumber - 1) * pageSize)
-             .Take(pageSize)
-             .ToListAsync().Result;
-            return await Repo.GetTasksWithFilters(status, priority, pageNumber, pageSize, employeeId)
-                       .Skip(pageSize * 10).Take(10)
-                       .ProjectTo<BaseTaskDTO>(configsProvider)
-                       .ToListAsync();
-        }
+      //      var tasks = Repo.GetTasksWithFilters(status, priority, pageNumber, pageSize, employeeId)
+      //       .Skip((pageNumber - 1) * pageSize)
+      //       .Take(pageSize)
+      //       .ToListAsync().Result;
+      //      return await Repo.GetTasksWithFilters(status, priority, pageNumber, pageSize, employeeId)
+      //                 .Skip(pageSize * 10).Take(10)
+      //                 .ProjectTo<BaseTaskDTO>(configsProvider)
+      //                 .ToListAsync();
+      //  }
 
 
 
@@ -92,6 +99,30 @@ namespace InterviewTest.Application.Services.Tasks.Base
             {
                 return false;
             }
+        }
+
+        public async Task<PagedResultDto<BaseTaskDTO>> GetTaskPagedListAsync(TaskPagedAndSortedResultRequestDto input)
+        {
+            var tasks = await Repo.GetTasksWithFilters(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter, input.Status, input.Priority, input.EmployeeId);
+            var totalCount = tasks.Count();
+
+            var config = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Task, BaseTaskDTO>()
+                    .ReverseMap();
+            });
+            List<BaseTaskDTO> list = new List<BaseTaskDTO>();
+
+            var mapper = config.CreateMapper();
+            foreach (var item in tasks)
+            {
+                var taskToAdd = mapper.Map<BaseTaskDTO>(item);
+                list.Add(taskToAdd);
+            }
+
+            return  new PagedResultDto<BaseTaskDTO>(
+                   totalCount,
+                 (IReadOnlyList<BaseTaskDTO>)list
+               );
         }
     }
 }
