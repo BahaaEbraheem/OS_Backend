@@ -14,17 +14,16 @@ namespace InterviewTest.Application.Services.Tasks.Base.Models
         [Required]
         [MinLength(10, ErrorMessage = "Title must be at least 10 characters long")]
         public string Title { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         [Required(ErrorMessage = "Priority is required")]
         public Priority Priority { get; set; }
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
         [Required(ErrorMessage = "End date is required")]
         [DataType(DataType.Date)]
 
         public DateTime EndDate { get; set; }
         public long EmployeeId { get; set; }
 
-        public Employee Employee { get; set; }
 
         internal static void CreateMappingRules(AutoMapperGlobalProfile profile)
         {

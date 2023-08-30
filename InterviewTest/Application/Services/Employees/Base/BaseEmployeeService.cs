@@ -6,6 +6,7 @@ using InterviewTest.DB.Models;
 using InterviewTest.DB.Repositories;
 
 using Microsoft.EntityFrameworkCore;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 using Task = InterviewTest.DB.Models.Task;
 
 namespace InterviewTest.Application.Services.Employees.Base
@@ -18,9 +19,9 @@ namespace InterviewTest.Application.Services.Employees.Base
     public class BaseEmployeeService : BaseApplicationService<IEmployeeRepo, Employee, long>, IBaseEmployeeService
     {
         //private readonly AutoMapper.IConfigurationProvider configsProvider;
-        private readonly IMapper configsProvider;
+        private readonly IConfigurationProvider configsProvider;
 
-        public BaseEmployeeService(IEmployeeRepo repo, IMapper configsProvider) : base(repo)
+        public BaseEmployeeService(IEmployeeRepo repo, IConfigurationProvider configsProvider) : base(repo)
         {
             this.configsProvider = configsProvider;
         }
@@ -30,7 +31,7 @@ namespace InterviewTest.Application.Services.Employees.Base
         {
             return Repo.GetAll()
                         .Skip(page * 10).Take(10)
-                        .ProjectTo<BaseEmployeeeDTO>((global::AutoMapper.IConfigurationProvider)configsProvider)
+                        .ProjectTo<BaseEmployeeeDTO>(configsProvider)
                         .ToListAsync();
         }
 
